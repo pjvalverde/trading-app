@@ -3,10 +3,12 @@ import math
 from typing import Any
 
 try:
-    from ib_insync import IB, MarketOrder, Stock
+    from ib_insync import IB, LimitOrder, MarketOrder, Stock, StopOrder
 except Exception:  # pragma: no cover - handled at runtime if dependency missing
     IB = None
     MarketOrder = None
+    LimitOrder = None
+    StopOrder = None
     Stock = None
 
 
@@ -89,17 +91,11 @@ class IBService:
             if price is None:
                 continue
 
-            data.append(
-                {
-                    "symbol": symbol,
-                    "price": price,
-                    "timestamp": asyncio.get_event_loop().time(),
-                }
-            )
+            data.append({"symbol": symbol, "price": price})
 
         return data
 
-    async def place_market_order(self, symbol: str, side: str, quantity: float) -> dict[str, Any]:
+    async def _qualify(self, symbol: str) -> Any:
         if not self.connected:
             raise RuntimeError("IB is not connected")
 
@@ -108,15 +104,51 @@ class IBService:
         if not qualified:
             raise ValueError(f"Unable to qualify symbol: {symbol}")
 
-        order = MarketOrder(side.upper(), quantity)
-        trade = self._ib.placeOrder(qualified[0], order)
+        return qualified[0]
 
+    async def place_market_order(self, symbol: str, side: str, quantity: float) -> dict[str, Any]:
+        contract = await self._qualify(symbol)
+        order = MarketOrder(side.upper(), quantity)
+        trade = self._ib.placeOrder(contract, order)
         await asyncio.sleep(0.4)
 
         return {
             "symbol": symbol.upper().strip(),
             "side": side.upper(),
             "quantity": quantity,
+            "order_type": "MARKET",
+            "order_id": trade.order.orderId,
+            "status": trade.orderStatus.status,
+        }
+
+    async def place_limit_order(self, symbol: str, side: str, quantity: float, limit_price: float) -> dict[str, Any]:
+        contract = await self._qualify(symbol)
+        order = LimitOrder(side.upper(), quantity, limit_price)
+        trade = self._ib.placeOrder(contract, order)
+        await asyncio.sleep(0.4)
+
+        return {
+            "symbol": symbol.upper().strip(),
+            "side": side.upper(),
+            "quantity": quantity,
+            "order_type": "LIMIT",
+            "limit_price": limit_price,
+            "order_id": trade.order.orderId,
+            "status": trade.orderStatus.status,
+        }
+
+    async def place_stop_order(self, symbol: str, side: str, quantity: float, stop_price: float) -> dict[str, Any]:
+        contract = await self._qualify(symbol)
+        order = StopOrder(side.upper(), quantity, stop_price)
+        trade = self._ib.placeOrder(contract, order)
+        await asyncio.sleep(0.4)
+
+        return {
+            "symbol": symbol.upper().strip(),
+            "side": side.upper(),
+            "quantity": quantity,
+            "order_type": "STOP",
+            "stop_price": stop_price,
             "order_id": trade.order.orderId,
             "status": trade.orderStatus.status,
         }

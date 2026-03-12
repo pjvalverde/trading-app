@@ -20,13 +20,16 @@
           <p class="eyebrow">Interactive Brokers</p>
           <h1>Real-Time Trading Platform</h1>
         </div>
-        <div id="sourceBadge" class="badge">Source: SIMULATED</div>
+        <div class="header-badges">
+          <div id="sourceBadge" class="badge">Source: SIMULATED</div>
+          <div id="intervalBadge" class="badge alt">Candles: 5s</div>
+        </div>
       </header>
 
       <section class="grid">
         <article class="chart-card">
           <div class="card-title-row">
-            <h2>Live Price Chart</h2>
+            <h2>Live Candlestick Chart</h2>
             <label>
               Active Symbol
               <select id="activeSymbol"></select>
@@ -36,49 +39,99 @@
         </article>
 
         <aside class="panel-card">
-          <h2>IB Connection</h2>
-          <div class="form-grid">
-            <label>Host <input id="ibHost" value="127.0.0.1" /></label>
-            <label>Port <input id="ibPort" type="number" value="7497" /></label>
-            <label>Client ID <input id="ibClientId" type="number" value="28" /></label>
-          </div>
-          <div class="button-row">
-            <button id="connectBtn">Connect IB</button>
-            <button id="disconnectBtn" class="secondary">Disconnect</button>
-          </div>
-          <p id="ibStatus" class="status-line">Status: checking...</p>
+          <section class="panel-section">
+            <h2>IB Connection</h2>
+            <div class="form-grid">
+              <label>Host <input id="ibHost" value="127.0.0.1" /></label>
+              <label>Port <input id="ibPort" type="number" value="7497" /></label>
+              <label>Client ID <input id="ibClientId" type="number" value="28" /></label>
+            </div>
+            <div class="button-row">
+              <button id="connectBtn">Connect IB</button>
+              <button id="disconnectBtn" class="secondary">Disconnect</button>
+            </div>
+            <p id="ibStatus" class="status-line">Status: checking...</p>
+          </section>
 
-          <h3>Watchlist</h3>
-          <div class="button-row">
-            <input id="symbolsInput" placeholder="AAPL, MSFT, NVDA" />
-            <button id="subscribeBtn" class="secondary">Add</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Symbol</th>
-                  <th>Price</th>
-                  <th>Change</th>
-                </tr>
-              </thead>
-              <tbody id="quotesTable"></tbody>
-            </table>
-          </div>
+          <section class="panel-section">
+            <h3>Watchlist</h3>
+            <div class="button-row">
+              <input id="symbolsInput" placeholder="AAPL, MSFT, NVDA" />
+              <button id="subscribeBtn" class="secondary">Add</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>Change</th>
+                  </tr>
+                </thead>
+                <tbody id="quotesTable"></tbody>
+              </table>
+            </div>
+          </section>
 
-          <h3>Market Order</h3>
-          <div class="form-grid">
-            <label>Symbol <input id="orderSymbol" placeholder="AAPL" /></label>
-            <label>Side
-              <select id="orderSide">
-                <option value="BUY">BUY</option>
-                <option value="SELL">SELL</option>
-              </select>
-            </label>
-            <label>Quantity <input id="orderQty" type="number" min="1" step="1" value="1" /></label>
-          </div>
-          <button id="sendOrderBtn">Send Market Order</button>
-          <p id="orderStatus" class="status-line">Order channel idle.</p>
+          <section class="panel-section">
+            <h3>Advanced Order</h3>
+            <div class="form-grid">
+              <label>Type
+                <select id="orderType">
+                  <option value="MARKET">MARKET</option>
+                  <option value="LIMIT">LIMIT</option>
+                  <option value="STOP">STOP</option>
+                </select>
+              </label>
+              <label>Symbol <input id="orderSymbol" placeholder="AAPL" /></label>
+              <label>Side
+                <select id="orderSide">
+                  <option value="BUY">BUY</option>
+                  <option value="SELL">SELL</option>
+                </select>
+              </label>
+              <label>Quantity <input id="orderQty" type="number" min="1" step="1" value="1" /></label>
+              <label id="limitPriceWrap" class="hidden">Limit Price <input id="limitPrice" type="number" min="0" step="0.01" placeholder="190.50" /></label>
+              <label id="stopPriceWrap" class="hidden">Stop Price <input id="stopPrice" type="number" min="0" step="0.01" placeholder="182.20" /></label>
+            </div>
+            <button id="sendOrderBtn">Send Order</button>
+            <p id="orderStatus" class="status-line">Order channel idle.</p>
+          </section>
+
+          <section class="panel-section">
+            <h3>Strategy (SMA Crossover)</h3>
+            <div class="form-grid two-cols">
+              <label>Symbol <input id="strategySymbol" placeholder="AAPL" /></label>
+              <label>Mode
+                <select id="strategyMode">
+                  <option value="SIMULATED">SIMULATED</option>
+                  <option value="LIVE_IB">LIVE_IB</option>
+                </select>
+              </label>
+              <label>Short MA <input id="strategyShort" type="number" min="2" value="5" /></label>
+              <label>Long MA <input id="strategyLong" type="number" min="3" value="15" /></label>
+              <label>Order Qty <input id="strategyQty" type="number" min="1" step="1" value="1" /></label>
+              <label>Enabled
+                <select id="strategyEnabled">
+                  <option value="true">ON</option>
+                  <option value="false">OFF</option>
+                </select>
+              </label>
+            </div>
+            <button id="applyStrategyBtn" class="secondary">Apply Strategy</button>
+            <p id="strategyStatus" class="status-line">Strategy idle.</p>
+          </section>
+
+          <section class="panel-section">
+            <h3>Risk Rules</h3>
+            <div class="form-grid two-cols">
+              <label>Max Position <input id="riskMaxPosition" type="number" min="1" step="1" value="200" /></label>
+              <label>Max Notional <input id="riskMaxNotional" type="number" min="1" step="100" value="25000" /></label>
+              <label>Max Daily Loss <input id="riskMaxLoss" type="number" min="1" step="100" value="3000" /></label>
+            </div>
+            <button id="applyRiskBtn" class="secondary">Update Risk</button>
+            <p id="riskStatus" class="status-line">Risk profile loading...</p>
+          </section>
         </aside>
       </section>
     </main>
