@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IB Trading App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/app.css" />
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+  </head>
+  <body>
+    <div class="background-shape shape-a"></div>
+    <div class="background-shape shape-b"></div>
+
+    <main class="layout">
+      <header class="header-card">
+        <div>
+          <p class="eyebrow">Interactive Brokers</p>
+          <h1>Real-Time Trading Platform</h1>
+        </div>
+        <div id="sourceBadge" class="badge">Source: SIMULATED</div>
+      </header>
+
+      <section class="grid">
+        <article class="chart-card">
+          <div class="card-title-row">
+            <h2>Live Price Chart</h2>
+            <label>
+              Active Symbol
+              <select id="activeSymbol"></select>
+            </label>
+          </div>
+          <div id="chart" class="chart"></div>
+        </article>
+
+        <aside class="panel-card">
+          <h2>IB Connection</h2>
+          <div class="form-grid">
+            <label>Host <input id="ibHost" value="127.0.0.1" /></label>
+            <label>Port <input id="ibPort" type="number" value="7497" /></label>
+            <label>Client ID <input id="ibClientId" type="number" value="28" /></label>
+          </div>
+          <div class="button-row">
+            <button id="connectBtn">Connect IB</button>
+            <button id="disconnectBtn" class="secondary">Disconnect</button>
+          </div>
+          <p id="ibStatus" class="status-line">Status: checking...</p>
+
+          <h3>Watchlist</h3>
+          <div class="button-row">
+            <input id="symbolsInput" placeholder="AAPL, MSFT, NVDA" />
+            <button id="subscribeBtn" class="secondary">Add</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Price</th>
+                  <th>Change</th>
+                </tr>
+              </thead>
+              <tbody id="quotesTable"></tbody>
+            </table>
+          </div>
+
+          <h3>Market Order</h3>
+          <div class="form-grid">
+            <label>Symbol <input id="orderSymbol" placeholder="AAPL" /></label>
+            <label>Side
+              <select id="orderSide">
+                <option value="BUY">BUY</option>
+                <option value="SELL">SELL</option>
+              </select>
+            </label>
+            <label>Quantity <input id="orderQty" type="number" min="1" step="1" value="1" /></label>
+          </div>
+          <button id="sendOrderBtn">Send Market Order</button>
+          <p id="orderStatus" class="status-line">Order channel idle.</p>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
